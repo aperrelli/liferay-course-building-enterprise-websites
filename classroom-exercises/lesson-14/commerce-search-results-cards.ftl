@@ -1,129 +1,58 @@
 <style>
     .badge {
-        padding: 10px;
         font-size: .8rem;
+        padding: 10px;
     }
     .card-title {
         font-size: 1rem;
     }
+    .custom-checkbox label {
+        padding-top:0.125rem;
+    }
     .product-category {
+        font-size: 1rem;
+    }
+    .product-spec {
         font-size: 0.8rem;
     }
-    .suggested {
-        background-color: #2e5aac !important;
-        color: #ffffff !important;
-    }
-    .custom-checkbox label {
-        padding-top: 0.125rem;
+    .product-specs {
+        min-height: 1.5rem;
     }
 </style>
-
-<#assign commerceContext = renderRequest.getAttribute("COMMERCE_CONTEXT") />
-
-<#if commerceContext?has_content>
-    <#assign
-        account = commerceContext.getAccountEntry()
-        accountId = account.getAccountEntryId()
-        channelId = commerceContext.getCommerceChannelId()
-    />
-
-    <div class="product-card-tiles">
+<div class="product-card-tiles">
+    <div class="row">
         <#if entries?has_content>
             <#list entries as curCPCatalogEntry>
                 <#assign
-                    cpDefinitionId = curCPCatalogEntry.getCPDefinitionId()
+                    commerceContext = renderRequest.getAttribute("COMMERCE_CONTEXT")
+                    friendlyURL = cpContentHelper.getFriendlyURL(curCPCatalogEntry, themeDisplay)
                     productId = curCPCatalogEntry.getCProductId()
                     productName = curCPCatalogEntry.getName()
-                    productShortDescription = curCPCatalogEntry.getShortDescription()
-                    productDescription = curCPCatalogEntry.getDescription()
-                    friendlyURL = cpContentHelper.getFriendlyURL(curCPCatalogEntry, themeDisplay)
-                    defaultImageURL = cpContentHelper.getDefaultImageFileURL(accountId, cpDefinitionId)
-                    defaultImageFileVersion = cpContentHelper.getCPDefinitionImageFileVersion(cpDefinitionId, request)
-                    productDetail = restClient.get("/headless-commerce-delivery-catalog/v1.0/channels/${channelId}/products/${productId}?accountId=${accountId}&nestedFields=categories,productSpecifications")
-                    categories = productDetail.categories
-                    specifications = productDetail.productSpecifications
-                    tags = productDetail.tags
-                    featuredSpecificationKeys = ["fit", "weight", "material"]
-                    isSuggested = false
-                    suggestedClass = ""
+                    accountEntryId = commerceContext.getAccountEntry().getAccountEntryId()
+                    channelId = commerceContext.getCommerceChannelId()
+                    defaultImageURL = cpContentHelper.getDefaultImageFileURL(accountEntryId, curCPCatalogEntry.getCPDefinitionId())
+                    productDetail = restClient.get("/headless-commerce-delivery-catalog/v1.0/channels/${channelId}/products/${productId}?accountId=${accountEntryId}&nestedFields=productSpecifications,categories")
+                    productCategories = productDetail.categories
                 />
-
-                <#if cpContentHelper.getDefaultCPSku(curCPCatalogEntry)?has_content>
-                    <#assign sku = cpContentHelper.getDefaultCPSku(curCPCatalogEntry).getSku() />
-                <#else>
-                    <#assign sku = "" />
-                </#if>
-
-                <#if tags?seq_contains("suggested")>
-                    <#assign isSuggested = true />
-                    <#assign suggestedClass = "suggested" />
-                </#if>
-
-                <div class="cp-renderer">
-                    <div class="card d-flex flex-column product-card">
-                        <div class="card-item-first position-relative">
-                            <a href="${friendlyURL}">
-                                <img src="${defaultImageURL}" class="card-img-top" alt="${productName}" />
-                                <div class="aspect-ratio-item-bottom-left">
-                                    <@liferay_commerce_ui["availability-label"] CPCatalogEntry=curCPCatalogEntry />
-                                </div>
-                            </a>
-                        </div>
-
-                        <div class="card-body d-flex flex-column justify-content-between py-2 ${suggestedClass}">
-                            <div class="cp-information">
-                                <p class="card-title ${suggestedClass}" title="${productName}">
-                                    <a class="${suggestedClass}" href="${friendlyURL}">
-                                        <span class="text-truncate-inline">
-                                            <span class="text-truncate">${productName}</span>
-                                        </span>
-                                    </a>
-                                </p>
-
-                                <#if categories?has_content>
-                                    <#assign categoryCount = 0 />
-                                    <#list categories as category>
-                                        <#if categoryCount gt 0>|</#if>
-                                        <span class="product-category mb-1">${category.name}</span>
-                                        <#assign categoryCount++ />
-                                    </#list>
-                                </#if>
-
-                                <#if specifications?has_content>
-                                    <#list specifications as specification>
-                                        <#if featuredSpecificationKeys?seq_contains(specification.specificationKey)>
-                                            <span class="badge badge-secondary">${specification.value}</span>
-                                        </#if>
-                                    </#list>
-                                </#if>
-                            </div>
-                            <div class="autofit-float autofit-row autofit-row-center compare-wishlist">
-                                <div class="autofit-col autofit-col-expand compare-checkbox">
-                                    <div class="autofit-section">
-                                        <div class="custom-checkbox custom-control custom-control-primary">
-                                            <div class="custom-checkbox custom-control">
-                                                <@liferay_commerce_ui["compare-checkbox"]
-                                                    CPCatalogEntry=curCPCatalogEntry
-                                                    label="Compare"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="autofit-col">
-                                    <div class="autofit-section">
-                                        <@liferay_commerce_ui["add-to-wish-list"]
-                                            CPCatalogEntry=curCPCatalogEntry
-                                            large=false
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                <a class="col-4" href="${friendlyURL}">
+                    <div class="card product-card shadow-sm">
+                        <img class="card-img-top" src="${defaultImageURL}" alt="${productName}" />
+                        <div class="px-3 py-2">
+                            <h5 class="card-title text-truncate">${productName}</h5>
+                            <#if productCategories?has_content>
+                                <#assign categoryCount = 0 />
+                                <#list productCategories as category>
+                                    <#if categoryCount gt 0>
+                                        |
+                                    </#if>
+                                    <span class="product-category mb-1">${category.name}</span>
+                                    <#assign categoryCount++ />
+                                </#list>
+                            </#if>
                         </div>
                     </div>
-                </div>
+                </a>
             </#list>
         </#if>
     </div>
-</#if>
+</div>
