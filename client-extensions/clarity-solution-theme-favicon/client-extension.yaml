@@ -1,0 +1,16 @@
+assemble:
+    -   from: assets
+        hashify: "*.svg"
+        into: static
+clarity-solution-theme-favicon-dark:
+    name: Clarity Solution Theme Favicon Dark
+    type: themeFavicon
+    url: dark.*.svg
+clarity-solution-theme-favicon-light:
+    name: Clarity Solution Theme Favicon Light
+    type: themeFavicon
+    url: light.*.svg
+clarity-solution-theme-favicon-primary:
+    name: Clarity Solution Theme Favicon Primary
+    type: themeFavicon
+    url: primary.*.svg
