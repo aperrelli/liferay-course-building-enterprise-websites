@@ -13,3 +13,5 @@ gradle-local.properties
 **/.DS_Store
 **/build
 **/dist
+/.idea/
+/.vscode/

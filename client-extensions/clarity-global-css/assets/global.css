@@ -209,6 +209,6 @@ button.facet-clear-btn > strong {
     padding-left: 1rem;
 }
 
-.lfr-layout-structure-item-container {
+.lfr-layout-structure-item-container.see-difference-bg{
     background-color: #eeeeee;
 }
