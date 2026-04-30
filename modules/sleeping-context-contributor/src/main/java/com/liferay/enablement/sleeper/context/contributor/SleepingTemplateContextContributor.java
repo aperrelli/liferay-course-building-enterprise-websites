@@ -4,7 +4,7 @@ import com.liferay.portal.kernel.template.TemplateContextContributor;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -12,15 +12,15 @@ import org.osgi.service.component.annotations.Component;
  * @author dnebinger
  */
 @Component(
-	property = "type=" + TemplateContextContributor.TYPE_GLOBAL,
-	service = TemplateContextContributor.class
+		property = "type=" + TemplateContextContributor.TYPE_GLOBAL,
+		service = TemplateContextContributor.class
 )
 public class SleepingTemplateContextContributor
-	implements TemplateContextContributor {
+		implements TemplateContextContributor {/// /
 
 	@Override
 	public void prepare(
-		Map<String, Object> contextObjects, HttpServletRequest request) {
+			Map<String, Object> contextObjects, HttpServletRequest request) {
 
 		contextObjects.put("sleeper", new Sleeper());
 	}
